@@ -19,11 +19,13 @@
 <textarea style="display:block;"></textarea>
 
 <script type="text/javascript">
+	const refreshButton = document.querySelector("#refreshButton");
+
 	function showRandomNumber() {
 		let textArea = document.querySelector("textarea");
 		document.hasStorageAccess().then(hasAccess => {
 			if (!hasAccess) {
-				textArea.value = "Cookie not accessible!";
+				textArea.value = "Cookie not present!";
 			} else {
 				try{
 					const currentInput = document.cookie.split('; ').find(row => row.startsWith('randomNumber')).split('=')[1];
@@ -62,25 +64,25 @@
 	}
 
 	function setRefreshButtonHandler() {
-		let refreshButton = document.querySelector("#refreshButton");
 		refreshButton.addEventListener("click", () => {
 			document.hasStorageAccess().then(hasAccess => {
-			  	if (!hasAccess) {
-			    		return document.requestStorageAccess();
-			  		}
-				}).then(_ => {
-					showRandomNumber();
-				}).catch(err => {
-			  		// error obtaining storage access.
-			  		board.innerHTML = "Error happened!";
-			  		console.log(err);
-				});
+		  		if (!hasAccess) {
+		    		return document.requestStorageAccess();
+		  		}
+			}).then(_ => {
+				showRandomNumber();
+			}).catch(err => {
+		  		// error obtaining storage access.
+		  		board.innerHTML = "Error happened!";
+		  		console.log(err);
+			});
 		});
 	}
 
 	setSubmitButtonHandler();
 	setRefreshButtonHandler();
 	showRandomNumber();
+	//refreshButton.click();	// does not work - event must be trusted?
 </script>
 </body>
 </html>
