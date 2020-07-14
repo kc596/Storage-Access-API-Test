@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<title>First Party Page</title>
+</head>
+<body>
+
+<h1> Third Party Page </h1>
+<h3> Let's store some random number in storage for fun!</h3>
+
+<p> Enter a random number and the existing stored number will be replaced.</p>
+<input type="text" name="randomValue" />
+<input type="submit" id="submitButton" />
+<input type="button" value="Refresh" id="refreshButton" />
+
+<p style="color:green; margin: 50px 0px;" id="board"></p>
+<p>Existing value is shown in textarea:</p>
+<textarea style="display:block;"></textarea>
+
+<script type="text/javascript">
+	function showRandomNumber() {
+		let textArea = document.querySelector("textarea");
+		document.hasStorageAccess().then(hasAccess => {
+			if (!hasAccess) {
+				textArea.value = "Cookie not accessible!";
+			} else {
+				try{
+					const currentInput = document.cookie.split('; ').find(row => row.startsWith('randomNumber')).split('=')[1];
+					textArea.value = currentInput;
+				} catch(err) {
+					textArea.value = "Cookie not present!";
+				}
+			}
+		});
+	}
+
+	function setSubmitButtonHandler() {
+		let submitButton = document.querySelector("#submitButton");
+		submitButton.addEventListener("click", () => {
+			let board = document.querySelector("#board");
+			let newValue = document.querySelector('[name="randomValue"]').value;
+			if (isNaN(newValue)) {
+				board.innerHTML = "Invalid input!";
+			} else {
+				document.hasStorageAccess().then(hasAccess => {
+			  		if (!hasAccess) {
+			    		return document.requestStorageAccess();
+			  		}
+				}).then(_ => {
+					document.cookie = "randomNumber="+newValue;
+					board.innerHTML = "Value updated!";
+					showRandomNumber();
+				}).catch(err => {
+			  		// error obtaining storage access.
+			  		board.innerHTML = "Error happened!";
+			  		console.log(err);
+				});
+			}
+			showRandomNumber();
+		});
+	}
+
+	function setRefreshButtonHandler() {
+		let refreshButton = document.querySelector("#refreshButton");
+		refreshButton.addEventListener("click", () => {
+			document.hasStorageAccess().then(hasAccess => {
+			  	if (!hasAccess) {
+			    		return document.requestStorageAccess();
+			  		}
+				}).then(_ => {
+					showRandomNumber();
+				}).catch(err => {
+			  		// error obtaining storage access.
+			  		board.innerHTML = "Error happened!";
+			  		console.log(err);
+				});
+		});
+	}
+
+	setSubmitButtonHandler();
+	setRefreshButtonHandler();
+	showRandomNumber();
+</script>
+</body>
+</html>
