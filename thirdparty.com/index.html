@@ -25,7 +25,7 @@
 		let textArea = document.querySelector("textarea");
 		document.hasStorageAccess().then(hasAccess => {
 			if (!hasAccess) {
-				textArea.value = "Cookie not present!";
+				textArea.value = "Cookie not accessible!";
 			} else {
 				try{
 					const currentInput = document.cookie.split('; ').find(row => row.startsWith('randomNumber')).split('=')[1];
