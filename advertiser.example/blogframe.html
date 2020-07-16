@@ -1,0 +1,66 @@
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+<style>
+    .hidden {
+        display:none;
+    }
+</style>
+
+<div>
+    <center>
+    <h2>Third party cookies are blocked on your browser. </h2>
+    <h3>There's no way for us to show you this content for free :(</h3>
+    <hr>
+    <button type="button" class="btn btn-success">Pay 500$ now!</button>&nbsp;&nbsp;
+    <button type="button" class="btn btn-warning" id="showad-btn">Show Ads!</button>&nbsp;&nbsp;
+    <button type="button" class="btn btn-danger" id="fursat-btn">Other option</button>
+    <hr>
+    <img src="fursat.png" width="400px;" id="fursat-img" class="hidden"></img>
+    </center>
+</div>
+
+<script type="text/javascript">
+    const privateKey = "-----BEGIN RSA PRIVATE KEY-----\nMIICXAIBAAKBgQC3fDHJgKTbD2GtSDU033JvDdzWOg3da20jUfZbNevxcJSMvWcW\npyaj7sq62WKhGLZvY3V6If+RBXCzTCmBqenMXqVBsoX81+Zj3/ZmuFvAcRZ2p7Em\noAPKSt4FNappiqvLle81NptneYpcUG0KKpNPloONwjO2c2hhMNCp3Ul8YQIDAQAB\nAoGACAVs48M08cKlYX7jnJEcHpC7k73r9z8IAWBG5cvgqahjRhfNlubtwILi5/Iy\n5pn+97WgYBt2Ya+cMqpksh9scgi4VZcotjee37DmP52gooaV7HteNhEBUcQN1xin\nHitm05dU2Wwgq2S75GISAuATRVLJxLQCUSrDGgn2QpWLmVUCQQDsHNQJqoXKE22Z\nfAlWOKVkC0fc5qDcCz8IGT488UxQKlK3JX2rQfIih1ed+Q4TOEKlCfLtOO8DeCuW\nEjn/T/tLAkEAxvCWc06b7Xg9VQxS2cKW4FONv+rUd6C6rLBNOhx98+qNrPpv4l9P\nJknGxyXk2fTLLFnt84l2S+ePT3sautePgwJAMeItUhV6yqSsJR81gcfZ+XcAqcT3\n+0VM/dMHeSypqM4oR5VeJY57L5xUgIWb2aerPN8LOd8rcBo1azFSm4Q0XQJAWIyw\nOwTrbOkPS7LfkeQGajVmq90n01Oso78ZsNsLyS1HAI68jGNmBKHkI7KfSdCnOseQ\nnc065ZBdfsBJ5o6aZwJBANXSkPj0Jsp/8PWt9+Cv9VrUOU/B7mc5ujAdtgmXYSYz\nm9OCal5DJnDl5Gt5cvkI99B775rZjcHi/hRBd5zzphU=\n-----END RSA PRIVATE KEY-----";
+    const publicKey = "-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC3fDHJgKTbD2GtSDU033JvDdzW\nOg3da20jUfZbNevxcJSMvWcWpyaj7sq62WKhGLZvY3V6If+RBXCzTCmBqenMXqVB\nsoX81+Zj3/ZmuFvAcRZ2p7EmoAPKSt4FNappiqvLle81NptneYpcUG0KKpNPloON\nwjO2c2hhMNCp3Ul8YQIDAQAB\n-----END PUBLIC KEY-----";
+
+    let firstPayload = {};
+    let secondPayload = {};
+    document.hasStorageAccess().then(hasAccess => {
+        console.log("advertiser.example checking for storage access");
+        if (!hasAccess) {
+            console.log("advertiser.example don't have storage access. Sending key to encrypt content.");
+            firstPayload["publicKey"] = publicKey;
+            firstPayload["access"] = false;
+        } else {
+            console.log("advertiser.example have storage access in starting!");
+            firstPayload["access"] = true;
+        }
+        parent.postMessage(firstPayload, "*");
+    });
+
+
+    const fursatButton = document.querySelector("#fursat-btn");
+    const fursatImage = document.querySelector("#fursat-img");
+    fursatButton.addEventListener("click", () => {
+        fursatImage.classList.toggle("hidden");
+    });
+
+    const showAdButton = document.querySelector("#showad-btn");
+    showAdButton.addEventListener("click", () => {
+        console.log("User chose to see ad by advertiser.example");
+        document.hasStorageAccess().then(hasAccess => {
+            if(!hasAccess) {
+                console.log("advertiser.example requesting for storage access");
+                return document.requestStorageAccess();
+            }
+        }).then(_ => {
+            console.log("advertiser.example given storage access by user!");
+            document.cookie = "randomNumber="+Math.floor(Math.random()*1000);
+            secondPayload["access"] = true;
+            secondPayload["privateKey"] = privateKey;
+            parent.postMessage(secondPayload, "*");
+        }).catch(err => {
+            // error obtaining storage access.
+            console.log("Error! "+err);
+        });
+    })
+</script>

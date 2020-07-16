@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<title>Advertiser Page</title>
+</head>
+<body>
+
+<h1> Advertiser Page </h1>
+<h3> All cookies are shown!</h3>
+
+<textarea style="display:block;"></textarea>
+
+<script type="text/javascript">
+	function showAllCookies() {
+		let textArea = document.querySelector("textarea");
+		textArea.value = document.cookie;
+	}
+	showAllCookies();
+</script>
+</body>
+</html>
