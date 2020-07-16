@@ -19,44 +19,32 @@
 <textarea style="display:block;"></textarea>
 
 <script type="text/javascript">
-	const refreshButton = document.querySelector("#refreshButton");
-
-	function showRandomNumber() {
-		let textArea = document.querySelector("textarea");
-		document.hasStorageAccess().then(hasAccess => {
-			if (!hasAccess) {
-				textArea.value = "Cookie not accessible!";
-			} else {
-				try{
-					const currentInput = document.cookie.split('; ').find(row => row.startsWith('randomNumber')).split('=')[1];
-					textArea.value = currentInput;
-				} catch(err) {
-					textArea.value = "Cookie not present!";
-				}
-			}
-		});
-	}
-
 	function setSubmitButtonHandler() {
 		let submitButton = document.querySelector("#submitButton");
 		submitButton.addEventListener("click", () => {
+			console.log("Submit button clicked!");
 			let board = document.querySelector("#board");
 			let newValue = document.querySelector('[name="randomValue"]').value;
 			if (isNaN(newValue)) {
 				board.innerHTML = "Invalid input!";
 			} else {
 				document.hasStorageAccess().then(hasAccess => {
+					console.log("Checking storage access");
 			  		if (!hasAccess) {
+			  			console.log("storage access not given! Requesting.");
 			    		return document.requestStorageAccess();
+			  		} else {
+			  			console.log("Storage access is allowed by default!");
 			  		}
 				}).then(_ => {
+					console.log("After storage access given!");
 					document.cookie = "randomNumber="+newValue;
 					board.innerHTML = "Value updated!";
 					showRandomNumber();
 				}).catch(err => {
 			  		// error obtaining storage access.
 			  		board.innerHTML = "Error happened!";
-			  		console.log(err);
+			  		console.log("Error! "+err);
 				});
 			}
 			showRandomNumber();
@@ -64,24 +52,50 @@
 	}
 
 	function setRefreshButtonHandler() {
-		refreshButton.addEventListener("auxclick", () => {
+		const refreshButton = document.querySelector("#refreshButton");
+		let evt = "click";
+		try {
+			const parentUrl = new URL(document.referrer);
+			const urlParams = new URLSearchParams(parentUrl.search);
+			evt = urlParams.get("evt");
+			console.log("Evt: " + evt);
+		} catch(err) {
+			console.log(err);
+		}
+
+		refreshButton.addEventListener(evt, () => {	//auxclick also works
+			console.log("Refresh button event occured!");
 			document.hasStorageAccess().then(hasAccess => {
+				console.log("Checking storage access");
 		  		if (!hasAccess) {
+		  			console.log("storage access not given! Requesting.");
 		    		return document.requestStorageAccess();
+		  		} else {
+		  			console.log("Storage access is allowed by default!");
 		  		}
 			}).then(_ => {
+				console.log("After storage access given for refresh!");
 				showRandomNumber();
 			}).catch(err => {
 		  		// error obtaining storage access.
 		  		board.innerHTML = "Error happened!";
-		  		console.log(err);
+		  		console.log("Error! "+err);
 			});
 		});
 	}
 
+	function showRandomNumber() {
+		let textArea = document.querySelector("textarea");
+		try{
+			const currentInput = document.cookie.split('; ').find(row => row.startsWith('randomNumber')).split('=')[1];
+			textArea.value = currentInput;
+		} catch(err) {
+			textArea.value = "Cookie not present or not allowed!";
+		}
+	}
+
 	setSubmitButtonHandler();
 	setRefreshButtonHandler();
-	showRandomNumber();
 	//refreshButton.click();	// does not work - event must be trusted?
 </script>
 </body>
