@@ -50,6 +50,7 @@
         document.hasStorageAccess().then(hasAccess => {
             if(!hasAccess) {
                 console.log("advertiser.example requesting for storage access");
+                alert("Do you want to allow tracking?");
                 return document.requestStorageAccess();
             }
         }).then(_ => {
